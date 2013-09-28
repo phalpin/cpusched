@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace cpusched.Processes.Execution
 {
-    class ExecutionTimeUnit
+    public class ExecutionTimeUnit
     {
 
         #region Private Vars

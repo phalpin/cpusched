@@ -1,10 +1,11 @@
-﻿namespace cpusched.Execution
+﻿namespace cpusched.Processes
 {
 
     public enum ProcessState
     {
         READY,
-        IO
+        IO,
+        COMPLETE
     }
 
 }

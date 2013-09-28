@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using cpusched.Execution;
+using cpusched.Processes;
+using cpusched.Processes.Execution;
 
 namespace cpusched.Queues
 {
-    class ProcessQueue
+    /// <summary>
+    /// The ProcessQueue object is used within FCFS, etc objects to run Processes. Abstraction on the Process Level.
+    /// </summary>
+    public class ProcessQueue
     {
 
         #region Private Vars
@@ -48,6 +52,23 @@ namespace cpusched.Queues
         #endregion
 
         public ProcessQueue() { }
+
+        public void RunQueue()
+        {
+            switch (this._readyprocs[0].Time.Current.Type)
+            {
+                case ExecutionTimeType.BURST:
+                    //The process is ready for burst.
+                    this._readyprocs[0].Run();
+                    break;
+                case ExecutionTimeType.IO:
+                    //The process needs to go to IO.
+                    this._ioprocs.Add(this._readyprocs[0]);
+                    //Remove it from the ready queue.
+                    this._readyprocs.RemoveAt(0);
+                    break;
+            }
+        }
 
 
     }
