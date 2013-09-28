@@ -1,4 +1,4 @@
-﻿namespace cpusched.Processes
+﻿namespace cpusched.Execution
 {
 
     public enum ProcessState

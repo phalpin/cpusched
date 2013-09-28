@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using cpusched.Processes.Execution;
 
-namespace cpusched.Processes
+namespace cpusched.Execution
 {
     public class Process
     {
@@ -12,6 +13,7 @@ namespace cpusched.Processes
         #region Private Vars
 
             private ProcessState _state;
+            private ExecutionTime _executiontimes;
 
         #endregion
 

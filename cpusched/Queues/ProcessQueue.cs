@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using cpusched.Execution;
+
+namespace cpusched.Queues
+{
+    class ProcessQueue
+    {
+
+        #region Private Vars
+
+            private List<Process> _readyprocs = new List<Process>();
+            private List<Process> _ioprocs = new List<Process>();
+
+        #endregion
+
+        #region Public Accessors
+
+            /// <summary>
+            /// List of All Processes ready/waiting in the queue
+            /// </summary>
+            public List<Process> ReadyProcs
+            {
+                get { return this._readyprocs; }
+                set { this._readyprocs = value; }
+            }
+
+            /// <summary>
+            /// All processes currently in IO
+            /// </summary>
+            public List<Process> IOProcs
+            {
+                get { return this._ioprocs; }
+                set { this._ioprocs = value; }
+            }
+
+            /// <summary>
+            /// Accessor for the next item in the queue.
+            /// </summary>
+            public Process Next
+            {
+                get { return this._readyprocs[0]; }
+            }
+
+        #endregion
+
+        public ProcessQueue() { }
+
+
+    }
+}

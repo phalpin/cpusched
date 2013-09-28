@@ -4,8 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cpusched.Processes
+namespace cpusched.Execution
 {
+    
+    /// <summary>
+    /// Helper class to implement a realtime process delivery routine.
+    /// </summary>
     class ProcessDeliverer
     {
 
@@ -14,7 +18,6 @@ namespace cpusched.Processes
             private List<Process> _incoming;
 
         #endregion
-
 
 
         #region Public Accessors
@@ -29,5 +32,25 @@ namespace cpusched.Processes
             }
 
         #endregion
+
+        public ProcessDeliverer() { }
+
+        /// <summary>
+        /// Gets arrivals at this current point.
+        /// </summary>
+        /// <returns></returns>
+        public List<Process> GetArrivals()
+        {
+            List<Process> result = new List<Process>();
+
+            foreach (Process p in this._incoming)
+            {
+                
+            }
+
+            return result;
+        }
+
+
     }
 }
