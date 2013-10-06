@@ -29,6 +29,9 @@ namespace cpusched.Processes
                 set { this._state = value; }
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
             public ExecutionTime Time
             {
                 get { return this._executiontime; }

@@ -46,29 +46,31 @@ namespace cpusched.Queues
             /// </summary>
             public Process Next
             {
-                get { return this._readyprocs[0]; }
+                get { return this._readyprocs.ElementAt(0); }
             }
 
         #endregion
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public ProcessQueue() { }
 
-        public void RunQueue()
-        {
-            switch (this._readyprocs[0].Time.Current.Type)
-            {
-                case ExecutionTimeType.BURST:
-                    //The process is ready for burst.
-                    this._readyprocs[0].Run();
-                    break;
-                case ExecutionTimeType.IO:
-                    //The process needs to go to IO.
-                    this._ioprocs.Add(this._readyprocs[0]);
-                    //Remove it from the ready queue.
-                    this._readyprocs.RemoveAt(0);
-                    break;
-            }
-        }
+        /// <summary>
+        /// Runs this queue.
+        /// </summary>
+        public void Run() { }
+
+        /// <summary>
+        /// Waits all processes in this queue.
+        /// </summary>
+        public void Wait() { }
+
+        /// <summary>
+        /// Adds a process to this queue.
+        /// </summary>
+        /// <param name="p">Process to Add</param>
+        public void AddProcess(Process p) { }
 
 
     }
