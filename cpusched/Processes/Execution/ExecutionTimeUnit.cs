@@ -39,5 +39,11 @@ namespace cpusched.Processes.Execution
         #endregion
 
         public ExecutionTimeUnit() { }
+
+        public ExecutionTimeUnit(int d, ExecutionTimeType t)
+        {
+            this._duration = d;
+            this._type = t;
+        }
     }
 }

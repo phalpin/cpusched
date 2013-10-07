@@ -6,12 +6,16 @@ using System.Threading.Tasks;
 
 namespace cpusched.Processes.Execution
 {
+    /// <summary>
+    /// Container for ExecutionTimeUnits.
+    /// </summary>
     public class ExecutionTime
     {
 
         #region Private Vars
 
-            private List<ExecutionTimeUnit> _timeList = new List<ExecutionTimeUnit>();
+        private List<ExecutionTimeUnit> _timeList;
+        private Process _parent;
 
         #endregion
 
@@ -23,7 +27,22 @@ namespace cpusched.Processes.Execution
             /// </summary>
             public ExecutionTimeUnit Current
             {
-                get { return this._timeList[0]; }
+                get {
+                    if (this._timeList.Count > 0)
+                    {
+                        return this._timeList[0];
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            public Process Parent
+            {
+                get { return this._parent; }
+                set { this._parent = value; }
             }
 
             /// <summary>
@@ -46,6 +65,11 @@ namespace cpusched.Processes.Execution
 
         public ExecutionTime() { }
 
+        public ExecutionTime(List<ExecutionTimeUnit> t)
+        {
+            this._timeList = t;
+        }
+
 
         /// <summary>
         /// Advances this ExecutionTime queue.
@@ -62,11 +86,15 @@ namespace cpusched.Processes.Execution
         /// <returns></returns>
         public static ExecutionTime operator--(ExecutionTime t)
         {
-            t.Current.Duration--;
-            if (t.Current.Duration == 0)
+            if (t.Current != null)
             {
-                t.Advance();
+                t.Current.Duration--;
+                if (t.Current.Duration == 0)
+                {
+                    t.Advance();
+                }
             }
+
             return t;
         }
 
@@ -75,5 +103,14 @@ namespace cpusched.Processes.Execution
 
 
 
+    }
+
+    /// <summary>
+    /// Types of ExecutionTimeUnits.
+    /// </summary>
+    public enum ExecutionTimeType
+    {
+        BURST,
+        IO
     }
 }

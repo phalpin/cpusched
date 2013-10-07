@@ -1,8 +1,13 @@
-﻿<Window x:Class="cpusched.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
+        xmlns:Queues="clr-namespace:cpusched.Queues" x:Class="cpusched.MainWindow"
+        Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize">
     <Grid>
-        
+        <Button Content="RUN QUEUE" HorizontalAlignment="Left" Margin="10,292,0,0" VerticalAlignment="Top" Width="497" Click="Button_Click_1"/>
+        <Label x:Name="lblResults" Content="QUEUE TEST RESULTS" HorizontalAlignment="Left" Margin="154,2,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="18"/>
+        <DataGrid x:Name="gridResults" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Height="216" Width="497" HorizontalGridLinesBrush="#FF646464" VerticalGridLinesBrush="#FF646464"/>
+        <Label x:Name="lblUtilization" Content="CPU Utilization:" HorizontalAlignment="Left" Margin="10,262,0,0" VerticalAlignment="Top" Width="497"/>
+
     </Grid>
 </Window>
