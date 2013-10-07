@@ -59,6 +59,8 @@
     <Compile Include="Queues\FCFS.cs" />
     <Compile Include="Queues\IProcessQueue.cs" />
     <Compile Include="Queues\ProcessQueue.cs" />
+    <Compile Include="Queues\RR.cs" />
+    <Compile Include="Queues\SJF.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
