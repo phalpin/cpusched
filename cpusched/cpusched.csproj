@@ -57,6 +57,7 @@
     <Compile Include="Processes\Execution\ExecutionTimeType.cs" />
     <Compile Include="Processes\Execution\ExecutionTimeUnit.cs" />
     <Compile Include="Queues\FCFS.cs" />
+    <Compile Include="Queues\IProcessQueue.cs" />
     <Compile Include="Queues\ProcessQueue.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

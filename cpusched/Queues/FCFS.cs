@@ -14,46 +14,6 @@ namespace cpusched.Queues
         public FCFS() { }
 
         /// <summary>
-        /// Runs the processes through in a FCFS Fashion.
-        /// </summary>
-        public override QueueExecutionResult Run()
-        {
-            QueueExecutionResult result = QueueExecutionResult.IDLE;
-            //Before running anything, sort.
-            this.Sort();
-            if(this._state != QueueState.COMPLETE){
-                //Check what Sort has to say about the state of the Queue.
-                switch (this._state)
-                {
-                    //Case for the queue being ready to run.
-                    case QueueState.READY:
-                        if (this.Next != null) this.Next.Run();
-                        this.IncrementTimes();
-                        break;
-                    case QueueState.ALLIO:
-                        this.IncrementTimes();
-                        this._idleTime++;
-                        break;
-                }
-
-                this._totalTime++;
-            }
-            
-            return result;
-        }
-
-        /// <summary>
-        /// Waits all processes in this queue. Stuff in IO runs, stuff in Ready waits.
-        /// </summary>
-        public override void Wait()
-        {
-            //Run all procs in IO.
-            foreach (Process p in this._ioprocs) p.Run();
-            //Wait all procs in the ready queue.
-            foreach (Process p in this._readyprocs) p.Wait();
-        }
-
-        /// <summary>
         /// Sorts processes in Ready queue in a FCFS fashion.
         /// </summary>
         protected override void Sort()
@@ -126,26 +86,6 @@ namespace cpusched.Queues
             }
 
 
-        }
-
-        /// <summary>
-        /// Increments times for everything except Next.
-        /// </summary>
-        public override void IncrementTimes()
-        {
-            foreach (Process p in this._readyprocs) if (p != this._next) p.Wait();
-            foreach (Process p in this._ioprocs) p.Run();
-            
-        }
-
-
-        /// <summary>
-        /// Adds a process to this queue.
-        /// </summary>
-        /// <param name="p">Process to add.</param>
-        public override void AddProcess(Processes.Process p)
-        {
-            this._readyprocs.Add(p);
         }
 
     }

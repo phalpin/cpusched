@@ -38,9 +38,11 @@ namespace cpusched
         {
             //CHANGE THE BELOW LINE TO TEST YOUR QUEUE.
             //EXAMPLE:
-            //FCFS testqueue = new FCFS(); becomes...
-            //SJF testqueue = new SJF();
-            FCFS testqueue = new FCFS();
+            //ProcessQueue testqueue = new FCFS();
+            //Becomes...
+            //ProcessQueue testqueue = new SJF(); //etc
+            ProcessQueue testqueue = new FCFS();
+            
 
             #region Process Instantiation.
             int[][] time = new int[8][];
@@ -113,7 +115,7 @@ namespace cpusched
             gridResults.ItemsSource = dt.DefaultView;
             gridResults.HorizontalGridLinesBrush = gridResults.VerticalGridLinesBrush = new SolidColorBrush(Colors.LightGray);
 
-            this.lblUtilization.Content = "CPU Utilization: " + testqueue.CPUUtil.ToString();
+            this.lblUtilization.Content = "CPU Utilization: " + Decimal.Round((testqueue.CPUUtil * 100), 2) + "%";
             #endregion
 
             //Debug breakpoint sp
