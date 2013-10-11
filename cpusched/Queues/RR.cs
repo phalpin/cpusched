@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using cpusched.Processes;
 
 namespace cpusched.Queues
 {
@@ -22,12 +23,62 @@ namespace cpusched.Queues
             set { this._timequantum = value; }
         }
 
+        //Allows us to initialize a RR Queue with a Time Quantum
+        public RR(int timequantum)
+        {
+            this._timequantum = timequantum;
+        }
+
         /// <summary>
         /// Sorting routine for Round Robin
         /// </summary>
         protected override void Sort()
-        {
-            //Do stuff
+        {            
+            //Initial Condition Solution
+            if (this._totalTime == 0) this._next = this._readyprocs[0];
+
+
+            //If there's no processes left at all in ready and IO, set queuestate to complete.
+            if (this._readyprocs.Count == 0 && this._ioprocs.Count == 0) this._state = QueueState.COMPLETE;
+            //Otherwise, go ahead and assign next process.
+            else
+            {
+                //If there's no processes ready, but processes in the IO queue, this state changes to allIO.
+                if (this._readyprocs.Count == 0 && this._ioprocs.Count > 0)
+                {
+                    this._state = QueueState.ALLIO;
+                    this._next = null;
+                }
+
+                //Otherwise, if there's processes in the ready queue, this queue is ready.
+                else if (this._readyprocs.Count > 0)
+                {
+                    this._state = QueueState.READY;
+                    if (this.Next != null)
+                    {
+                        //If process is in IO, the next process is up.
+                        if (this.Next.State == ProcessState.IO) this._next = this._readyprocs[0];
+
+                        //If the next process is Complete, the next process is up.
+                        if (this.Next.State == ProcessState.COMPLETE) this._next = this._readyprocs[0];
+
+                        //Time Quantum Handling.
+                        if (this.Next.ActiveTimeOnProcessor >= this.TimeQuantum)
+                        {
+                            //Remove the item from the top of the list.
+                            Process p = this.Next;
+                            this._readyprocs.Remove(p);
+                            this._readyprocs.Add(p);
+                            //Now, set a new next.
+                            this._next = this._readyprocs[0];
+                        }
+                    }
+                    else
+                    {
+                        this._next = this._readyprocs[0];
+                    }
+                }
+            }
         }
 
     }
