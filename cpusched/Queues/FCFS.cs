@@ -18,58 +18,11 @@ namespace cpusched.Queues
         /// </summary>
         protected override void Sort()
         {
-            //If we're all out of processes, this queue is complete. Special case in each remove block.
+            //If we're all out of processes, this queue is complete.
             if (this._readyprocs.Count == 0 && this._ioprocs.Count == 0) this._state = QueueState.COMPLETE;
-            //Otherwise, go ahead and sort.
+            //Otherwise, go ahead and assign next process.
             else
             {
-                #region Shift Processes out of IOProcs to Ready.
-                List<Process> removeFromIO = new List<Process>();
-                foreach (Process p in this._ioprocs)
-                {
-                    if (p.State == ProcessState.READY)
-                    {
-                        this._readyprocs.Add(p);
-                        removeFromIO.Add(p);
-                    }
-                    else if (p.State == ProcessState.COMPLETE)
-                    {
-                        this._completeprocs.Add(p);
-                        removeFromIO.Add(p);
-                    }
-                }
-                foreach (Process p in removeFromIO)
-                {
-                    this._ioprocs.Remove(p);
-                    //Special case in case we're removing the last process.
-                    if (p.State == ProcessState.COMPLETE && this._readyprocs.Count == 0 && this._ioprocs.Count == 0) this._state = QueueState.COMPLETE;
-                }
-                #endregion
-
-                #region Shift Processes out of Ready to IOProcs.
-                List<Process> removeFromReady = new List<Process>();
-                foreach (Process p in this._readyprocs)
-                {
-                    if (p.State == ProcessState.IO)
-                    {
-                        this._ioprocs.Add(p);
-                        removeFromReady.Add(p);
-                    }
-                    else if (p.State == ProcessState.COMPLETE)
-                    {
-                        this._completeprocs.Add(p);
-                        removeFromReady.Add(p);
-                    }
-                }
-                foreach (Process p in removeFromReady)
-                {
-                    this._readyprocs.Remove(p);
-                    //Special case in case we're removing the last process.
-                    if (p.State == ProcessState.COMPLETE && this._readyprocs.Count == 0 && this._ioprocs.Count == 0) this._state = QueueState.COMPLETE;
-                }
-                #endregion
-
-
                 //If there's no processes ready, but processes in the IO queue, this state changes to allIO.
                 if (this._readyprocs.Count == 0 && this._ioprocs.Count > 0)
                 {
