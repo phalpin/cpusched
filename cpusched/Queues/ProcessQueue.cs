@@ -91,8 +91,13 @@ namespace cpusched.Queues
         public QueueExecutionResult Run()
         {
             QueueExecutionResult result = QueueExecutionResult.IDLE;
+            
             //Before running anything, sort.
+            this.RemoveIOFromReady();
+            this.RemoveReadyFromIO();
             this.Sort();
+            
+            //Now, actually run the damn thing.
             if (this._state != QueueState.COMPLETE)
             {
                 //Check what Sort has to say about the state of the Queue.
@@ -156,6 +161,63 @@ namespace cpusched.Queues
         public void AddProcess(Processes.Process p)
         {
             this._readyprocs.Add(p);
+        }
+
+        /// <summary>
+        /// Removes IO Processes from the Ready Queue.
+        /// </summary>
+        protected void RemoveIOFromReady()
+        {
+            List<Process> removeFromReady = new List<Process>();
+            foreach (Process p in this._readyprocs)
+            {
+                if (p.State == ProcessState.IO)
+                {
+                    this._ioprocs.Add(p);
+                    removeFromReady.Add(p);
+                }
+                if (p.State == ProcessState.COMPLETE)
+                {
+                    this._completeprocs.Add(p);
+                    removeFromReady.Add(p);
+                }
+            }
+            
+            //Remove processes from ready as necessary.
+            foreach (Process p in removeFromReady)
+            {
+                this._readyprocs.Remove(p); 
+            }
+        }
+
+        /// <summary>
+        /// Removes Ready Processes from IO Queue.
+        /// </summary>
+        protected void RemoveReadyFromIO()
+        {
+            List<Process> removeFromIO = new List<Process>();
+            
+            //Iterate through IOProcs
+            foreach (Process p in this._ioprocs)
+            {
+                if (p.State == ProcessState.READY)
+                {
+                    this._readyprocs.Add(p);
+                    removeFromIO.Add(p);
+                }
+                else if (p.State == ProcessState.COMPLETE)
+                {
+                    this._completeprocs.Add(p);
+                    removeFromIO.Add(p);
+                }
+            }
+
+            //remove processes from IO as necessary.
+            foreach (Process p in removeFromIO)
+            {
+                this._ioprocs.Remove(p);
+            }
+
         }
 
 

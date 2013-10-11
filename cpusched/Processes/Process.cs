@@ -115,12 +115,14 @@ namespace cpusched.Processes
             else
             {
                 //Change process state to IO if necessary.
-                if (this._executiontime.Current.Type == ExecutionTimeType.IO) this._state = ProcessState.IO;
+                if (this._executiontime.Current.Type == ExecutionTimeType.IO)
+                {
+                    this._state = ProcessState.IO;
+                    this._activeTimeOnProc = 0;
+                }
                 //Change process state to Ready if necessary.
                 else if (this._executiontime.Current.Type == ExecutionTimeType.BURST) this._state = ProcessState.READY;
-
-                
-                
+  
             }
 
 
