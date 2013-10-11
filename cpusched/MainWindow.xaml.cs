@@ -42,7 +42,7 @@ namespace cpusched
             //ProcessQueue testqueue = new FCFS();
             //Becomes...
             //ProcessQueue testqueue = new SJF(); //etc
-            ProcessQueue testqueue = new FCFS();
+            ProcessQueue testqueue = new RR(5);
             
 
             #region Process Instantiation.
