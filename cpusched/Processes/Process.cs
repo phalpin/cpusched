@@ -19,6 +19,7 @@ namespace cpusched.Processes
             private int _waitingtime;
             private int _turnaroundtime;
             private int _responsetime;
+            private int _activeTimeOnProc = 0;
 
         #endregion
 
@@ -75,6 +76,14 @@ namespace cpusched.Processes
                 set { this._name = value; }
             }
 
+            /// <summary>
+            /// How long this process has been active on the processor (for RR Time Quantum Checks)
+            /// </summary>
+            public int ActiveTimeOnProcessor
+            {
+                get { return this._activeTimeOnProc; }
+            }
+
         #endregion
 
         public Process() { }
@@ -97,6 +106,8 @@ namespace cpusched.Processes
             this._executiontime--;
             //Increase turnaround time.
             this._turnaroundtime++;
+            //Increase Active Time on Processor
+            this._activeTimeOnProc++;
             
             //If there's no time remaining after running, change state to complete.
             if (this._executiontime.Remaining == 0) this._state = ProcessState.COMPLETE;
@@ -124,6 +135,7 @@ namespace cpusched.Processes
             if (!this._hasRun) this._responsetime++;
             this._waitingtime++;
             this._turnaroundtime++;
+            this._activeTimeOnProc = 0;
         }
 
     }
