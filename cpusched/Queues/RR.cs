@@ -59,6 +59,10 @@ namespace cpusched.Queues
                         //If process is in IO, the next process is up.
                         if (this.Next.State == ProcessState.IO) this._next = this._readyprocs[0];
 
+                        //If the next process is Complete, the next process is up.
+                        if (this.Next.State == ProcessState.COMPLETE) this._next = this._readyprocs[0];
+
+                        //Time Quantum Handling.
                         if (this.Next.ActiveTimeOnProcessor >= this.TimeQuantum)
                         {
                             //Remove the item from the top of the list.
