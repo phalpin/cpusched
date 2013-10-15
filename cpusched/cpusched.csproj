@@ -53,14 +53,24 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ContextSwitchView.xaml.cs">
+      <DependentUpon>ContextSwitchView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Processes\Execution\ExecutionTime.cs" />
     <Compile Include="Processes\Execution\ExecutionTimeType.cs" />
     <Compile Include="Processes\Execution\ExecutionTimeUnit.cs" />
     <Compile Include="Queues\FCFS.cs" />
+    <Compile Include="Queues\IMultiLevelQueue.cs" />
     <Compile Include="Queues\IProcessQueue.cs" />
+    <Compile Include="Queues\MLFQ.cs" />
+    <Compile Include="Queues\MultiLevelQueue.cs" />
     <Compile Include="Queues\ProcessQueue.cs" />
     <Compile Include="Queues\RR.cs" />
     <Compile Include="Queues\SJF.cs" />
+    <Page Include="ContextSwitchView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -76,7 +86,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Processes\Process.cs" />
-    <Compile Include="Processes\ProcessDeliverer.cs" />
     <Compile Include="Processes\ProcessState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -95,6 +104,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

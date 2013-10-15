@@ -7,15 +7,11 @@ using cpusched.Processes;
 
 namespace cpusched.Queues
 {
-    interface IProcessQueue
+    interface IMultiLevelQueue
     {
         QueueExecutionResult Run();
 
-        void Wait();
-
-        void IncrementTimes();
-
-        void AddProcess(Process p);
+        void AddProcessQueue(ProcessQueue pq);
 
         Process GetContextSwitch();
     }

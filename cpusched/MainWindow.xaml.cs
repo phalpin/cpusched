@@ -16,6 +16,8 @@ using cpusched.Queues;
 using cpusched.Processes;
 using cpusched.Processes.Execution;
 using System.Data;
+using System.Threading;
+using System.Windows.Media.Effects;
 
 namespace cpusched
 {
@@ -24,6 +26,9 @@ namespace cpusched
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        private string _contextSwitchString = "";
+
         public MainWindow()
         {
             InitializeComponent();
@@ -37,12 +42,19 @@ namespace cpusched
         /// <param name="e"></param>
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+
+            //this.MAINWINDOW.Effect = new BlurEffect();
+
+
             //CHANGE THE BELOW LINE TO TEST YOUR QUEUE.
             //EXAMPLE:
             //ProcessQueue testqueue = new FCFS();
             //Becomes...
             //ProcessQueue testqueue = new SJF(); //etc
-            ProcessQueue testqueue = new RR(5);
+            //ProcessQueue testqueue = new FCFS();
+            ProcessQueue testqueue = new SJF();
+            List<Process> contextswitches = new List<Process>();
+            //ProcessQueue testqueue = new RR(3);
             
 
             #region Process Instantiation.
@@ -76,10 +88,20 @@ namespace cpusched
                 pnum++;
             }
 
-            while (testqueue.State != QueueState.COMPLETE) testqueue.Run();
+
+
+            Thread thread = new Thread(() => RunQueue(testqueue, contextswitches));
+
+            thread.Start();
+            thread.Join();
+
+            //while (testqueue.State != QueueState.COMPLETE) testqueue.Run();
             #endregion
 
+            this.btn_contextswitchview.IsEnabled = true;
+
             #region Display crap for debugging
+            
             //Datatable to display results.
             DataTable dt = new DataTable();
             dt.Columns.Add("Process");
@@ -123,6 +145,71 @@ namespace cpusched
             object r = new Object();
 
             
+        }
+
+        private void RunQueue(ProcessQueue q, List<Process> ctxswtch)
+        {
+            while (q.State != QueueState.COMPLETE)
+            {
+                q.Run();
+                #region Context Switch Crap
+                if (q.ContextSwitch && (q.State == QueueState.READY || q.State == QueueState.ALLIO))
+                {
+                    Process switched = q.GetContextSwitch();
+                    this._contextSwitchString += "Current Time: " + (q.TotalTime - 1).ToString() + System.Environment.NewLine + System.Environment.NewLine;
+
+                    this._contextSwitchString += "Now Running: ";
+                    this._contextSwitchString += switched == null ? "[idle]" : switched.Name;
+                    this._contextSwitchString += System.Environment.NewLine;
+
+
+                    //Get all processes in ready.
+                    this._contextSwitchString += "........................................................" + System.Environment.NewLine + System.Environment.NewLine;
+                    this._contextSwitchString += "Ready Queue:\tProcess\tBurst" + System.Environment.NewLine;
+                    if (q.ReadyProcs.Count == 0 || (q.ReadyProcs.Count == 1 && q.IOProcs.Count == 0)) this._contextSwitchString += "\t\t\t\t[empty]" + System.Environment.NewLine;
+                    else foreach (Process p in q.ReadyProcs) if (p != switched) this._contextSwitchString += "\t\t\t\t" + p.Name + "\t\t" + p.Time.Current.Duration + System.Environment.NewLine;
+
+                    //Get all processes in IO
+                    this._contextSwitchString += "........................................................" + System.Environment.NewLine + System.Environment.NewLine;
+                    this._contextSwitchString += "Now in I/O:\t\tProcess\tRemaining I/O Time" + System.Environment.NewLine;
+                    if (q.IOProcs.Count == 0) this._contextSwitchString += "\t\t\t\t[empty]" + System.Environment.NewLine;
+                    else foreach (Process p in q.IOProcs) if (p != switched) this._contextSwitchString += "\t\t\t\t" + p.Name + "\t\t" + (p.Time.Current.Duration+1).ToString() + System.Environment.NewLine;
+
+                    
+                    if (q.CompleteProcs.Count > 0)
+                    {
+                        this._contextSwitchString += "........................................................" + System.Environment.NewLine + System.Environment.NewLine;
+                        this._contextSwitchString += "Completed:\t\t\t\t";
+                        int iter = 1;
+                        foreach (Process p in q.CompleteProcs)
+                        {
+                            this._contextSwitchString += p.Name;
+                            if (iter != q.CompleteProcs.Count) this._contextSwitchString += ", ";
+                            else this._contextSwitchString += System.Environment.NewLine + System.Environment.NewLine;
+                            iter++;
+                        }
+                    }
+
+                    this._contextSwitchString += "::::::::::::::::::::::::::::::::::::::::::::::::::::::::" + System.Environment.NewLine;
+                    
+
+
+
+
+                    this._contextSwitchString += System.Environment.NewLine + System.Environment.NewLine;
+
+                }
+                #endregion
+            }
+
+            //Thread.Sleep(500);
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            ContextSwitchView csv = new ContextSwitchView(this._contextSwitchString);
+            csv.Owner = this;
+            csv.Show();
         }
     }
 }

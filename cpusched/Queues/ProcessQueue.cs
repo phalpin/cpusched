@@ -21,8 +21,10 @@ namespace cpusched.Queues
             protected List<Process> _completeprocs = new List<Process>();
             protected Process _next = null;
             protected QueueState _state = QueueState.READY;
+            protected bool _switched = false;
             protected int _totalTime = 0;
             protected int _idleTime = 0;
+            protected string _queueName = "";
 
         #endregion
 
@@ -82,6 +84,31 @@ namespace cpusched.Queues
                 }
             }
 
+            /// <summary>
+            /// The total time that this queue has been running.
+            /// </summary>
+            public int TotalTime
+            {
+                get { return this._totalTime; }
+            }
+
+            /// <summary>
+            /// Indicates whether or not there was a context switch on the last run.
+            /// </summary>
+            public bool ContextSwitch
+            {
+                get { return this._switched; }
+            }
+
+            /// <summary>
+            /// The name of this Queue.
+            /// </summary>
+            public string Name
+            {
+                get { return this._queueName; }
+                set { this._queueName = value; }
+            }
+
         #endregion
 
         /// <summary>
@@ -91,12 +118,9 @@ namespace cpusched.Queues
         public QueueExecutionResult Run()
         {
             QueueExecutionResult result = QueueExecutionResult.IDLE;
-            
-            //Before running anything, sort.
-            this.RemoveIOFromReady();
-            this.RemoveReadyFromIO();
+
             this.Sort();
-            
+
             //Now, actually run the damn thing.
             if (this._state != QueueState.COMPLETE)
             {
@@ -125,6 +149,11 @@ namespace cpusched.Queues
 
                 this._totalTime++;
             }
+
+            //Before running anything, sort.
+            this.RemoveIOFromReady();
+            this.RemoveReadyFromIO();
+            
 
             return result;
         }
@@ -220,7 +249,19 @@ namespace cpusched.Queues
 
         }
 
+        /// <summary>
+        /// Returns context switches that occur.
+        /// </summary>
+        /// <returns>Process that was switched to</returns>
+        public Process GetContextSwitch()
+        {
+            Process Result = new Process();
 
+            Result = this._next;
+
+            return Result;
+
+        }
     }
 
     /// <summary>

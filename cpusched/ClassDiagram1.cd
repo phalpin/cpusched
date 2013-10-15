@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="cpusched.App" Collapsed="true">
+    <Position X="15" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.ContextSwitchView" Collapsed="true">
+    <Position X="15" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>ContextSwitchView.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.MainWindow" Collapsed="true">
+    <Position X="15" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABABAAAAAAAAAAAAAAAAAAAAAAAICAAAAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.Processes.Execution.ExecutionTime">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAIAAAAAAAAAACAQAAQAAAAAAIAAAAAAAAAAEA=</HashCode>
+      <FileName>Processes\Execution\ExecutionTime.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.Processes.Execution.ExecutionTimeUnit">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAQAABAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Processes\Execution\ExecutionTimeUnit.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.Processes.Process">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BIAAYAEAAAAAAAAEAAAASAQAAASAAAQBAAABBAAAAQI=</HashCode>
+      <FileName>Processes\Process.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.Properties.Resources" Collapsed="true">
+    <Position X="15" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.Properties.Settings" Collapsed="true">
+    <Position X="15" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.Queues.FCFS">
+    <Position X="0.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Queues\FCFS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.Queues.MLFQ" Collapsed="true">
+    <Position X="11.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Queues\MLFQ.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.Queues.ProcessQueue">
+    <Position X="2.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AkAAAIQAAAAAAAAABAARiAQEEIQAAAkiEZAABEAAABI=</HashCode>
+      <FileName>Queues\ProcessQueue.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="cpusched.Queues.RR">
+    <Position X="2.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAAAQAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Queues\RR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="cpusched.Queues.SJF">
+    <Position X="5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Queues\SJF.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="cpusched.Queues.IProcessQueue">
+    <Position X="1" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAgAAAAAQAAAAAABAAAAAAAAI=</HashCode>
+      <FileName>Queues\IProcessQueue.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="cpusched.Processes.Execution.ExecutionTimeType">
+    <Position X="8.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Processes\Execution\ExecutionTime.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="cpusched.Processes.ProcessState">
+    <Position X="5.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Processes\ProcessState.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="cpusched.Queues.QueueState">
+    <Position X="0.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Queues\ProcessQueue.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="cpusched.Queues.QueueExecutionResult">
+    <Position X="0.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Queues\ProcessQueue.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
