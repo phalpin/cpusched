@@ -32,10 +32,12 @@ namespace cpusched.Queues
         /// <summary>
         /// Sorting routine for Round Robin
         /// </summary>
-        protected override void Sort()
-        {            
+        public override void Sort()
+        {
+            this._switched = false;
+            
             //Initial Condition Solution ***NOTE: DO NOT ADD CONTEXT SWITCH HERE***
-            if (this._totalTime == 0) this._next = this._readyprocs[0];
+            if (this._totalTime == 0 && this._readyprocs.Count > 0) this._next = this._readyprocs[0];
 
 
             //If there's no processes left at all in ready and IO, set queuestate to complete.
@@ -47,8 +49,9 @@ namespace cpusched.Queues
                 if (this._readyprocs.Count == 0 && this._ioprocs.Count > 0)
                 {
                     this._state = QueueState.ALLIO;
+                    if(this._next != null) this._switched = true;
                     this._next = null;
-                    this._switched = true;
+                    
                 }
 
                 //Otherwise, if there's processes in the ready queue, this queue is ready.
@@ -58,7 +61,11 @@ namespace cpusched.Queues
                     if (this.Next != null)
                     {
                         //If the next process is Complete, the next process is up.
-                        if (this.Next.State == ProcessState.COMPLETE || this.Next.State == ProcessState.IO) this._next = this._readyprocs[0]; //TODO: Add context switch functionality
+                        if (this.Next.State == ProcessState.COMPLETE || this.Next.State == ProcessState.IO)
+                        {
+                            this._next = this._readyprocs[0]; //TODO: Add context switch functionality
+                            this._switched = true;
+                        }
 
                         //Time Quantum Handling.
                         if (this.Next.ActiveTimeOnProcessor >= this.TimeQuantum)

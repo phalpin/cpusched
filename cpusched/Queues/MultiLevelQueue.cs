@@ -58,8 +58,9 @@ namespace cpusched.Queues
                 {
                     List<Process> result = new List<Process>();
                     foreach(ProcessQueue pq in this._queues){
-                        result.Concat(pq.CompleteProcs);
+                        result.AddRange(pq.CompleteProcs);
                     }
+                    result.Sort((x, y) => x.Name.CompareTo(y.Name));
                     return result;
                 }
             }
@@ -74,8 +75,9 @@ namespace cpusched.Queues
                     List<Process> result = new List<Process>();
                     foreach (ProcessQueue pq in this._queues)
                     {
-                        result.Concat(pq.ReadyProcs);
+                        result.AddRange(pq.ReadyProcs);
                     }
+                    result.Sort((x, y) => x.Name.CompareTo(y.Name));
                     return result;
                 }
             }
@@ -90,8 +92,31 @@ namespace cpusched.Queues
                     List<Process> result = new List<Process>();
                     foreach (ProcessQueue pq in this._queues)
                     {
-                        result.Concat(pq.IOProcs);
+                        result.AddRange(pq.IOProcs);
                     }
+                    result.Sort((x, y) => x.Name.CompareTo(y.Name));
+                    return result;
+                }
+            }
+
+            public string ReadyProcNames
+            {
+                get
+                {
+                    string result = "";
+                    foreach (Process p in this.ReadyProcs) result += "[" + p.Name + ":" + p.Parent.Name + ":" + p.Time.Current.Duration.ToString() + "] ";
+                    
+                    return result;
+                }
+            }
+
+            public string IOProcNames
+            {
+                get
+                {
+                    string result = "";
+                    foreach (Process p in this.IOProcs) result += "[" + p.Name + ":" + p.Parent.Name + ":" + p.Time.Current.Duration.ToString() + "] ";
+                    
                     return result;
                 }
             }
@@ -123,6 +148,9 @@ namespace cpusched.Queues
                 get{ return this._next; }
             }
 
+            /// <summary>
+            /// Name of the queue.
+            /// </summary>
             public string Name
             {
                 get { return this._name; }
@@ -137,8 +165,14 @@ namespace cpusched.Queues
         public QueueExecutionResult Run()
         {
             QueueExecutionResult result = QueueExecutionResult.IDLE;
-
             this.Sort();
+            result = this.RunWithoutSort();
+            return result;
+        }
+
+        public QueueExecutionResult RunWithoutSort()
+        {
+            QueueExecutionResult result = QueueExecutionResult.IDLE;
 
             //Now, actually run the damn thing.
             if (this._state != QueueState.COMPLETE)
@@ -150,7 +184,7 @@ namespace cpusched.Queues
                     case QueueState.READY:
                         if (this.Next != null)
                         {
-                            this.Next.Run();
+                            this.Next.RunWithoutSort();
                             result = QueueExecutionResult.RUN;
                         }
                         else
@@ -213,8 +247,16 @@ namespace cpusched.Queues
         public Process GetContextSwitch()
         {
             Process p = null;
-
+            if (this._next != null)
+            {
+                if (this._next.Next != null)
+                {
+                    p = this._next.Next;
+                }
+            }
             return p;
         }
+
+        public void Cleanup() { }
     }
 }

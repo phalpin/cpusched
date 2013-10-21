@@ -110,6 +110,28 @@ namespace cpusched.Queues
                 set { this._queueName = value; }
             }
 
+            public string ReadyProcNames
+            {
+                get
+                {
+                    string result = "";
+                    foreach (Process p in this.ReadyProcs) result += "[" + p.Name + ":" + p.Time.Current.Duration.ToString() + "] ";
+
+                    return result;
+                }
+            }
+
+            public string IOProcNames
+            {
+                get
+                {
+                    string result = "";
+                    foreach (Process p in this.IOProcs) result += "[" + p.Name + ":" + p.Time.Current.Duration.ToString() + "] ";
+
+                    return result;
+                }
+            }
+
         #endregion
 
         /// <summary>
@@ -121,6 +143,14 @@ namespace cpusched.Queues
             QueueExecutionResult result = QueueExecutionResult.IDLE;
 
             this.Sort();
+            result = this.RunWithoutSort();
+
+            return result;
+        }
+
+        public QueueExecutionResult RunWithoutSort()
+        {
+            QueueExecutionResult result = QueueExecutionResult.IDLE;
 
             //Now, actually run the damn thing.
             if (this._state != QueueState.COMPLETE)
@@ -154,7 +184,7 @@ namespace cpusched.Queues
             //Before running anything, sort.
             this.RemoveIOFromReady();
             this.RemoveReadyFromIO();
-            
+
 
             return result;
         }
@@ -164,12 +194,11 @@ namespace cpusched.Queues
         /// </summary>
         public void Wait()
         {
-            //Run all procs in IO.
-            foreach (Process p in this._ioprocs) p.Run();
-            //Wait all procs in the ready queue.
-            foreach (Process p in this._readyprocs) p.Wait();
 
+            this.IncrementTimes();
+            this._totalTime++;
             this.RemoveReadyFromIO();
+            this.RemoveIOFromReady();
         }
 
         /// <summary>
@@ -184,7 +213,7 @@ namespace cpusched.Queues
         /// <summary>
         /// Each ProcessQueue must implement its own Sort(). At the end of Sort(), this.Next should point to the next process to go, or null.
         /// </summary>
-        protected abstract void Sort();
+        public abstract void Sort();
 
         /// <summary>
         /// Adds a process to this queue.
@@ -192,7 +221,10 @@ namespace cpusched.Queues
         /// <param name="p">Process to add.</param>
         public void AddProcess(Processes.Process p)
         {
-            this._readyprocs.Add(p);
+            p.Parent = this;
+            if (p.State == ProcessState.READY) this._readyprocs.Add(p);
+            else if (p.State == ProcessState.IO) this._ioprocs.Add(p);
+            else this._ioprocs.Add(p);
         }
 
         /// <summary>
@@ -295,6 +327,20 @@ namespace cpusched.Queues
             if (this._readyprocs.Contains(proctoremove)) this._readyprocs.Remove(proctoremove);
             if (this._ioprocs.Contains(proctoremove)) this._ioprocs.Remove(proctoremove);
             if (this._next == proctoremove) this._next = null;
+        }
+
+        /// <summary>
+        /// Cleanup implementation - typically called by MultiLevelQueue.
+        /// </summary>
+        public void Cleanup()
+        {
+            if (this._next != null)
+            {
+                if (!this._readyprocs.Contains(this._next) && !this._ioprocs.Contains(this._next))
+                {
+                    this._next = null;
+                }
+            }
         }
     }
 

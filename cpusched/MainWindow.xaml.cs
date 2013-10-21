@@ -51,10 +51,9 @@ namespace cpusched
             //ProcessQueue testqueue = new FCFS();
             //Becomes...
             //ProcessQueue testqueue = new SJF(); //etc
-            ProcessQueue testqueue = new FCFS();
+            //ProcessQueue testqueue = new FCFS();
             //ProcessQueue testqueue = new SJF();
-            List<Process> contextswitches = new List<Process>();
-            //ProcessQueue testqueue = new RR(3);
+            ProcessQueue testqueue = new RR(6);
             
 
             #region Process Instantiation.
@@ -88,20 +87,28 @@ namespace cpusched
                 pnum++;
             }
 
+            MLFQ testmlqueue = new MLFQ();
+            testqueue.Name = "Q1";
+            testmlqueue.AddProcessQueue(testqueue);
+            testmlqueue.AddProcessQueue(new RR(11) { Name = "Q2" });
+            testmlqueue.AddProcessQueue(new FCFS() { Name = "Q3" });
 
 
-            Thread thread = new Thread(() => RunQueue(testqueue, contextswitches));
+
+            //Thread thread = new Thread(() => RunQueue(testqueue));
+            //IQueue displayQueue = testqueue;
+            
+            Thread thread = new Thread(() => RunQueue(testmlqueue));
+            IQueue displayQueue = testmlqueue;
 
             thread.Start();
             thread.Join();
-
-            //while (testqueue.State != QueueState.COMPLETE) testqueue.Run();
             #endregion
 
             this.btn_contextswitchview.IsEnabled = true;
 
             #region Display crap for debugging
-            
+
             //Datatable to display results.
             DataTable dt = new DataTable();
             dt.Columns.Add("Process");
@@ -109,9 +116,9 @@ namespace cpusched
             dt.Columns.Add("TT");
             dt.Columns.Add("RT");
 
-            testqueue.CompleteProcs.Sort((x, y) => x.Name.CompareTo(y.Name));
+            displayQueue.CompleteProcs.Sort((x, y) => x.Name.CompareTo(y.Name));
 
-            foreach (Process p in testqueue.CompleteProcs)
+            foreach (Process p in displayQueue.CompleteProcs)
             {
                 dt.Rows.Add(p.Name, p.WaitingTime, p.TurnaroundTime, p.ResponseTime);
             }
@@ -122,23 +129,23 @@ namespace cpusched
             double avgTurnaroundTime = 0;
             double avgResponseTime = 0;
 
-            foreach (Process p in testqueue.CompleteProcs)
+            foreach (Process p in displayQueue.CompleteProcs)
             {
                 avgWaitingTime += p.WaitingTime;
                 avgTurnaroundTime += p.TurnaroundTime;
                 avgResponseTime += p.ResponseTime;
             }
 
-            avgWaitingTime /= testqueue.CompleteProcs.Count;
-            avgTurnaroundTime /= testqueue.CompleteProcs.Count;
-            avgResponseTime /= testqueue.CompleteProcs.Count;
+            avgWaitingTime /= displayQueue.CompleteProcs.Count;
+            avgTurnaroundTime /= displayQueue.CompleteProcs.Count;
+            avgResponseTime /= displayQueue.CompleteProcs.Count;
 
             dt.Rows.Add("Avg", avgWaitingTime, avgTurnaroundTime, avgResponseTime);
 
             gridResults.ItemsSource = dt.DefaultView;
             gridResults.HorizontalGridLinesBrush = gridResults.VerticalGridLinesBrush = new SolidColorBrush(Colors.LightGray);
 
-            this.lblUtilization.Content = "CPU Utilization: " + Decimal.Round((testqueue.CPUUtil * 100), 2) + "%";
+            this.lblUtilization.Content = "CPU Utilization: " + Decimal.Round((displayQueue.CPUUtil * 100), 2) + "%";
             #endregion
 
             //Debug breakpoint sp
@@ -147,7 +154,7 @@ namespace cpusched
             
         }
 
-        private void RunQueue(IQueue q, List<Process> ctxswtch)
+        private void RunQueue(IQueue q)
         {
             while (q.State != QueueState.COMPLETE)
             {

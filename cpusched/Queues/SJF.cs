@@ -16,7 +16,7 @@ namespace cpusched.Queues
         /// <summary>
         /// Sorting routine for SJF
         /// </summary>
-        protected override void Sort()
+        public override void Sort()
         {
 
             //Do stuff

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using cpusched.Processes.Execution;
+using cpusched.Queues;
 
 namespace cpusched.Processes
 {
@@ -16,9 +17,9 @@ namespace cpusched.Processes
             private ExecutionTime _executiontime;
             private string _name;
             private bool _hasRun;
-            private int _waitingtime;
-            private int _turnaroundtime;
-            private int _responsetime;
+            private int _waitingtime = 0;
+            private int _turnaroundtime = 0;
+            private int _responsetime = 0;
             private int _activeTimeOnProc = 0;
 
         #endregion
@@ -83,6 +84,13 @@ namespace cpusched.Processes
             {
                 get { return this._activeTimeOnProc; }
             }
+
+            public ProcessQueue Parent
+            {
+                get;
+                set;
+            }
+
 
         #endregion
 

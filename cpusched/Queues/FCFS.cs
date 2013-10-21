@@ -16,7 +16,7 @@ namespace cpusched.Queues
         /// <summary>
         /// Sorts processes in Ready queue in a FCFS fashion.
         /// </summary>
-        protected override void Sort()
+        public override void Sort()
         {
             //Set switched to false by default.
             if(this._switched) this._switched = false;

@@ -14,23 +14,60 @@ namespace cpusched.Queues
         /// </summary>
         public override void Sort()
         {
-            //First, run through the processes from the last round, see if there's any demotions.
-            foreach (ProcessQueue p in this._queues)
+            this._switched = false;
+
+            if (this.ReadyProcs.Count == 0 && this.IOProcs.Count == 0) this._state = QueueState.COMPLETE;
+            else
             {
-                if (p.ContextSwitch)
+                //Sort all ProcessQueues.
+                foreach (ProcessQueue pq in this._queues) pq.Sort();
+
+                #region ProcessQueue Traversal for Demotions
+                foreach (ProcessQueue pq in this._queues)
                 {
-                    Process demotedproc = p.GetDemotedProcess();
-                    if (demotedproc != null)
+                    if (pq.ContextSwitch)
                     {
-                        if (demotedproc.State == ProcessState.IO) { };
+                        Process demotedproc = pq.GetDemotedProcess();
+                        if (demotedproc != null)
+                        {
+                            int index = this._queues.IndexOf(pq);
+                            if (index != this._queues.Count - 1)
+                            {
+                                this._queues[index + 1].AddProcess(demotedproc);
+                            }
+                            pq.Cleanup();
+                        }
                     }
                 }
+                #endregion
+
+                
+
+                //Traverse, starting from the top of this._queues
+                foreach (ProcessQueue pq in this._queues)
+                {
+                    //if it has processes available, we've found our match.
+                    if (pq.ReadyProcs.Count > 0 && pq.State != QueueState.COMPLETE)
+                    {
+                        this.State = QueueState.READY;
+                        if (pq != this._next || pq.ContextSwitch) this._switched = true;
+                        this._next = pq;
+                        return;
+                    }
+                }
+
+                //If we get out of that block, there's nothing there, so we go to all IO;
+                if (this._state == QueueState.READY) this._switched = true;
+                this._state = QueueState.ALLIO;
+                this._next = null;
+
+
             }
-            
-            foreach (ProcessQueue p in this._queues)
-            {
-                if (p.Next != null) this._next = null;
-            }
+
+
+
+
+
         }
 
 
