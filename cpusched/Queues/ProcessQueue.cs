@@ -11,7 +11,7 @@ namespace cpusched.Queues
     /// <summary>
     /// The ProcessQueue object is used within FCFS, etc objects to run Processes. Abstraction on the Process Level.
     /// </summary>
-    public abstract class ProcessQueue : IProcessQueue
+    public abstract class ProcessQueue : IQueue
     {
 
         #region Private Vars
@@ -21,8 +21,11 @@ namespace cpusched.Queues
             protected List<Process> _completeprocs = new List<Process>();
             protected Process _next = null;
             protected QueueState _state = QueueState.READY;
+            protected bool _switched = false;
             protected int _totalTime = 0;
             protected int _idleTime = 0;
+            protected string _queueName = "";
+            protected Process _qualifiedDemotion = null;
 
         #endregion
 
@@ -82,6 +85,53 @@ namespace cpusched.Queues
                 }
             }
 
+            /// <summary>
+            /// The total time that this queue has been running.
+            /// </summary>
+            public int TotalTime
+            {
+                get { return this._totalTime; }
+            }
+
+            /// <summary>
+            /// Indicates whether or not there was a context switch on the last run.
+            /// </summary>
+            public bool ContextSwitch
+            {
+                get { return this._switched; }
+            }
+
+            /// <summary>
+            /// The name of this Queue.
+            /// </summary>
+            public string Name
+            {
+                get { return this._queueName; }
+                set { this._queueName = value; }
+            }
+
+            public string ReadyProcNames
+            {
+                get
+                {
+                    string result = "";
+                    foreach (Process p in this.ReadyProcs) result += "[" + p.Name + ":" + p.Time.Current.Duration.ToString() + "] ";
+
+                    return result;
+                }
+            }
+
+            public string IOProcNames
+            {
+                get
+                {
+                    string result = "";
+                    foreach (Process p in this.IOProcs) result += "[" + p.Name + ":" + p.Time.Current.Duration.ToString() + "] ";
+
+                    return result;
+                }
+            }
+
         #endregion
 
         /// <summary>
@@ -91,12 +141,17 @@ namespace cpusched.Queues
         public QueueExecutionResult Run()
         {
             QueueExecutionResult result = QueueExecutionResult.IDLE;
-            
-            //Before running anything, sort.
-            this.RemoveIOFromReady();
-            this.RemoveReadyFromIO();
+
             this.Sort();
-            
+            result = this.RunWithoutSort();
+
+            return result;
+        }
+
+        public QueueExecutionResult RunWithoutSort()
+        {
+            QueueExecutionResult result = QueueExecutionResult.IDLE;
+
             //Now, actually run the damn thing.
             if (this._state != QueueState.COMPLETE)
             {
@@ -126,6 +181,11 @@ namespace cpusched.Queues
                 this._totalTime++;
             }
 
+            //Before running anything, sort.
+            this.RemoveIOFromReady();
+            this.RemoveReadyFromIO();
+
+
             return result;
         }
 
@@ -134,10 +194,11 @@ namespace cpusched.Queues
         /// </summary>
         public void Wait()
         {
-            //Run all procs in IO.
-            foreach (Process p in this._ioprocs) p.Run();
-            //Wait all procs in the ready queue.
-            foreach (Process p in this._readyprocs) p.Wait();
+
+            this.IncrementTimes();
+            this._totalTime++;
+            this.RemoveReadyFromIO();
+            this.RemoveIOFromReady();
         }
 
         /// <summary>
@@ -152,7 +213,7 @@ namespace cpusched.Queues
         /// <summary>
         /// Each ProcessQueue must implement its own Sort(). At the end of Sort(), this.Next should point to the next process to go, or null.
         /// </summary>
-        protected abstract void Sort();
+        public abstract void Sort();
 
         /// <summary>
         /// Adds a process to this queue.
@@ -160,7 +221,10 @@ namespace cpusched.Queues
         /// <param name="p">Process to add.</param>
         public void AddProcess(Processes.Process p)
         {
-            this._readyprocs.Add(p);
+            p.Parent = this;
+            if (p.State == ProcessState.READY) this._readyprocs.Add(p);
+            else if (p.State == ProcessState.IO) this._ioprocs.Add(p);
+            else this._ioprocs.Add(p);
         }
 
         /// <summary>
@@ -220,7 +284,64 @@ namespace cpusched.Queues
 
         }
 
+        /// <summary>
+        /// Returns context switches that occur.
+        /// </summary>
+        /// <returns>Process that was switched to</returns>
+        public Process GetContextSwitch()
+        {
+            Process Result = new Process();
 
+            Result = this._next;
+
+            return Result;
+
+        }
+
+        /// <summary>
+        /// Gets processes that can be demoted.
+        /// </summary>
+        /// <returns></returns>
+        public Process GetDemotedProcess()
+        {
+            Process p = null;
+            if (this._qualifiedDemotion != null)
+            {
+                p = _qualifiedDemotion;
+                this.RemoveProcessFromQueue(p);
+            }
+            
+            _qualifiedDemotion = null;
+            
+            return p;
+
+        }
+
+        /// <summary>
+        /// Removes a process from this queue (regardless of whether the process is in IO or Ready)
+        /// </summary>
+        /// <param name="proctoremove"></param>
+        protected void RemoveProcessFromQueue(Process proctoremove)
+        {
+            //Iterate through both, make sure that the process is removed.
+            if (this._readyprocs.Contains(proctoremove)) this._readyprocs.Remove(proctoremove);
+            if (this._ioprocs.Contains(proctoremove)) this._ioprocs.Remove(proctoremove);
+            if (this._next == proctoremove) this._next = null;
+        }
+
+        /// <summary>
+        /// Cleanup implementation - typically called by MultiLevelQueue.
+        /// </summary>
+        public void Cleanup()
+        {
+            if (this._next != null)
+            {
+                if (!this._readyprocs.Contains(this._next) && !this._ioprocs.Contains(this._next))
+                {
+                    this._next = null;
+                }
+            }
+        }
     }
 
     /// <summary>

@@ -32,10 +32,12 @@ namespace cpusched.Queues
         /// <summary>
         /// Sorting routine for Round Robin
         /// </summary>
-        protected override void Sort()
-        {            
-            //Initial Condition Solution
-            if (this._totalTime == 0) this._next = this._readyprocs[0];
+        public override void Sort()
+        {
+            this._switched = false;
+            
+            //Initial Condition Solution ***NOTE: DO NOT ADD CONTEXT SWITCH HERE***
+            if (this._totalTime == 0 && this._readyprocs.Count > 0) this._next = this._readyprocs[0];
 
 
             //If there's no processes left at all in ready and IO, set queuestate to complete.
@@ -43,11 +45,13 @@ namespace cpusched.Queues
             //Otherwise, go ahead and assign next process.
             else
             {
-                //If there's no processes ready, but processes in the IO queue, this state changes to allIO.
+                //If there's no processes ready, but processes in the IO queue, this state changes to all IO.
                 if (this._readyprocs.Count == 0 && this._ioprocs.Count > 0)
                 {
                     this._state = QueueState.ALLIO;
+                    if(this._next != null) this._switched = true;
                     this._next = null;
+                    
                 }
 
                 //Otherwise, if there's processes in the ready queue, this queue is ready.
@@ -56,11 +60,12 @@ namespace cpusched.Queues
                     this._state = QueueState.READY;
                     if (this.Next != null)
                     {
-                        //If process is in IO, the next process is up.
-                        if (this.Next.State == ProcessState.IO) this._next = this._readyprocs[0];
-
                         //If the next process is Complete, the next process is up.
-                        if (this.Next.State == ProcessState.COMPLETE) this._next = this._readyprocs[0];
+                        if (this.Next.State == ProcessState.COMPLETE || this.Next.State == ProcessState.IO)
+                        {
+                            this._next = this._readyprocs[0]; //TODO: Add context switch functionality
+                            this._switched = true;
+                        }
 
                         //Time Quantum Handling.
                         if (this.Next.ActiveTimeOnProcessor >= this.TimeQuantum)
@@ -69,13 +74,16 @@ namespace cpusched.Queues
                             Process p = this.Next;
                             this._readyprocs.Remove(p);
                             this._readyprocs.Add(p);
+                            this._qualifiedDemotion = p;
                             //Now, set a new next.
                             this._next = this._readyprocs[0];
+                            this._switched = true;
                         }
                     }
                     else
                     {
                         this._next = this._readyprocs[0];
+                        this._switched = true;
                     }
                 }
             }

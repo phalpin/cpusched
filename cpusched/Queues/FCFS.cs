@@ -16,8 +16,11 @@ namespace cpusched.Queues
         /// <summary>
         /// Sorts processes in Ready queue in a FCFS fashion.
         /// </summary>
-        protected override void Sort()
+        public override void Sort()
         {
+            //Set switched to false by default.
+            if(this._switched) this._switched = false;
+
             //If we're all out of processes, this queue is complete.
             if (this._readyprocs.Count == 0 && this._ioprocs.Count == 0) this._state = QueueState.COMPLETE;
             //Otherwise, go ahead and assign next process.
@@ -26,15 +29,25 @@ namespace cpusched.Queues
                 //If there's no processes ready, but processes in the IO queue, this state changes to allIO.
                 if (this._readyprocs.Count == 0 && this._ioprocs.Count > 0)
                 {
-                    this._state = QueueState.ALLIO;
-                    this._next = null;
+                    if (this.State == QueueState.READY)
+                    {
+                        this._state = QueueState.ALLIO; 
+                        this._next = null;
+                        this._switched = true;
+                    }
+
                 }
 
                 //Otherwise, if there's processes in the ready queue, this queue is ready.
                 else if (this._readyprocs.Count > 0)
                 {
                     this._state = QueueState.READY;
-                    this._next = this._readyprocs[0];
+                    if (this._next != this._readyprocs[0])
+                    {
+                        this._next = this._readyprocs[0];
+                        this._switched = true;
+                    }
+                    
                 }
             }
 
