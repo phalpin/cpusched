@@ -51,8 +51,8 @@ namespace cpusched
             //ProcessQueue testqueue = new FCFS();
             //Becomes...
             //ProcessQueue testqueue = new SJF(); //etc
-            //ProcessQueue testqueue = new FCFS();
-            ProcessQueue testqueue = new SJF();
+            ProcessQueue testqueue = new FCFS();
+            //ProcessQueue testqueue = new SJF();
             List<Process> contextswitches = new List<Process>();
             //ProcessQueue testqueue = new RR(3);
             
@@ -147,13 +147,13 @@ namespace cpusched
             
         }
 
-        private void RunQueue(ProcessQueue q, List<Process> ctxswtch)
+        private void RunQueue(IQueue q, List<Process> ctxswtch)
         {
             while (q.State != QueueState.COMPLETE)
             {
                 q.Run();
                 #region Context Switch Crap
-                if (q.ContextSwitch && (q.State == QueueState.READY || q.State == QueueState.ALLIO))
+                if (q.ContextSwitch || q.State == QueueState.COMPLETE)
                 {
                     Process switched = q.GetContextSwitch();
                     this._contextSwitchString += "Current Time: " + (q.TotalTime - 1).ToString() + System.Environment.NewLine + System.Environment.NewLine;

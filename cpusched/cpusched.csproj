@@ -60,8 +60,7 @@
     <Compile Include="Processes\Execution\ExecutionTimeType.cs" />
     <Compile Include="Processes\Execution\ExecutionTimeUnit.cs" />
     <Compile Include="Queues\FCFS.cs" />
-    <Compile Include="Queues\IMultiLevelQueue.cs" />
-    <Compile Include="Queues\IProcessQueue.cs" />
+    <Compile Include="Queues\IQueue.cs" />
     <Compile Include="Queues\MLFQ.cs" />
     <Compile Include="Queues\MultiLevelQueue.cs" />
     <Compile Include="Queues\ProcessQueue.cs" />

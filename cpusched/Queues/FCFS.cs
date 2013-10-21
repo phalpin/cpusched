@@ -29,7 +29,7 @@ namespace cpusched.Queues
                 //If there's no processes ready, but processes in the IO queue, this state changes to allIO.
                 if (this._readyprocs.Count == 0 && this._ioprocs.Count > 0)
                 {
-                    if (this._state == QueueState.READY)
+                    if (this.State == QueueState.READY)
                     {
                         this._state = QueueState.ALLIO; 
                         this._next = null;

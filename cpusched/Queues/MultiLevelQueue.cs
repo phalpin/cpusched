@@ -7,11 +7,17 @@ using cpusched.Processes;
 
 namespace cpusched.Queues
 {
-    public abstract class MultiLevelQueue : IMultiLevelQueue
+    public abstract class MultiLevelQueue : IQueue
     {
         #region Private Vars
 
-            private List<ProcessQueue> _queues = new List<ProcessQueue>();
+            protected List<ProcessQueue> _queues = new List<ProcessQueue>();
+            protected ProcessQueue _next = null;
+            protected QueueState _state = QueueState.READY;
+            protected bool _switched = false;
+            protected int _totalTime = 0;
+            protected int _idleTime = 0;
+            protected string _name = "";
 
         #endregion
 
@@ -26,6 +32,102 @@ namespace cpusched.Queues
                 set { this._queues = value; }
             }
 
+            /// <summary>
+            /// Determines the state of this MultiLevelQueue.
+            /// </summary>
+            public QueueState State
+            {
+                get { return this._state; }
+                set { this._state = value; }
+            }
+
+            /// <summary>
+            /// Returns whether or not a context switch occurred on this run.
+            /// </summary>
+            public bool ContextSwitch
+            {
+                get { return this._switched; }
+            }
+
+            /// <summary>
+            /// Complete Processes in all queues.
+            /// </summary>
+            public List<Process> CompleteProcs
+            {
+                get
+                {
+                    List<Process> result = new List<Process>();
+                    foreach(ProcessQueue pq in this._queues){
+                        result.Concat(pq.CompleteProcs);
+                    }
+                    return result;
+                }
+            }
+
+            /// <summary>
+            /// All processes ready in all queues.
+            /// </summary>
+            public List<Process> ReadyProcs
+            {
+                get
+                {
+                    List<Process> result = new List<Process>();
+                    foreach (ProcessQueue pq in this._queues)
+                    {
+                        result.Concat(pq.ReadyProcs);
+                    }
+                    return result;
+                }
+            }
+
+            /// <summary>
+            /// All processes in I/O in all queues.
+            /// </summary>
+            public List<Process> IOProcs
+            {
+                get
+                {
+                    List<Process> result = new List<Process>();
+                    foreach (ProcessQueue pq in this._queues)
+                    {
+                        result.Concat(pq.IOProcs);
+                    }
+                    return result;
+                }
+            }
+
+            /// <summary>
+            /// Total Time this queue has run.
+            /// </summary>
+            public int TotalTime
+            {
+                get { return this._totalTime; }
+            }
+
+            /// <summary>
+            /// Returns the total amount of CPU Utilization, expressed as a decimal value (EX: 82% = .82)
+            /// </summary>
+            public Decimal CPUUtil
+            {
+                   get
+                   {
+                       if (this._idleTime > 0) return ((this._totalTime - this._idleTime) / (Decimal)this._totalTime);
+                       else return 0;   
+                   }
+            }
+
+            /// <summary>
+            /// Returns the next process to run.
+            /// </summary>
+            public ProcessQueue Next{
+                get{ return this._next; }
+            }
+
+            public string Name
+            {
+                get { return this._name; }
+            }
+
         #endregion
 
         /// <summary>
@@ -36,7 +138,63 @@ namespace cpusched.Queues
         {
             QueueExecutionResult result = QueueExecutionResult.IDLE;
 
+            this.Sort();
+
+            //Now, actually run the damn thing.
+            if (this._state != QueueState.COMPLETE)
+            {
+                //Check what Sort has to say about the state of the Queue.
+                switch (this._state)
+                {
+                    //Case for the queue being ready to run.
+                    case QueueState.READY:
+                        if (this.Next != null)
+                        {
+                            this.Next.Run();
+                            result = QueueExecutionResult.RUN;
+                        }
+                        else
+                        {
+                            result = QueueExecutionResult.IDLE;
+                        }
+                        this.IncrementTimes();
+                        break;
+                    case QueueState.ALLIO:
+                        result = QueueExecutionResult.IDLE;
+                        this.IncrementTimes();
+                        this._idleTime++;
+                        break;
+                }
+
+                this._totalTime++;
+            }
+
+
             return result;
+        }
+
+        /// <summary>
+        /// Waits all ProcessQueues in this MultilevelQueue
+        /// </summary>
+        public void Wait()
+        {
+            foreach (ProcessQueue pq in this._queues) pq.Wait();
+        }
+
+        public abstract void Sort();
+
+        /// <summary>
+        /// Increments times in all queues that don't run.
+        /// </summary>
+        private void IncrementTimes()
+        {
+            foreach (ProcessQueue pq in this._queues)
+            {
+                if (pq != this._next)
+                {
+                    pq.Wait();
+                }
+            }
         }
 
         /// <summary>

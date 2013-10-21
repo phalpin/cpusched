@@ -64,14 +64,14 @@
   <Class Name="cpusched.Queues.MLFQ" Collapsed="true">
     <Position X="11.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Queues\MLFQ.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="cpusched.Queues.ProcessQueue">
     <Position X="2.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AkAAAIQAAAAAAAAABAARiAQEEIQAAAkiEZAABEAAABI=</HashCode>
+      <HashCode>AkAAAIRAAAAAAAAABAARjEQEEIQAAAkiEZAABEAAABI=</HashCode>
       <FileName>Queues\ProcessQueue.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -90,13 +90,6 @@
       <FileName>Queues\SJF.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="cpusched.Queues.IProcessQueue">
-    <Position X="1" Y="0.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AEAAAAAAAAAAAAAAAAAAgAAAAAQAAAAAABAAAAAAAAI=</HashCode>
-      <FileName>Queues\IProcessQueue.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
   <Enum Name="cpusched.Processes.Execution.ExecutionTimeType">
     <Position X="8.75" Y="3" Width="1.5" />
     <TypeIdentifier>

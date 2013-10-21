@@ -86,7 +86,9 @@ namespace cpusched.Processes
 
         #endregion
 
+
         public Process() { }
+
 
         public Process(ExecutionTime t)
         {

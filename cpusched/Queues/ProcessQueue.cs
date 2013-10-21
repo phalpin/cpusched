@@ -11,7 +11,7 @@ namespace cpusched.Queues
     /// <summary>
     /// The ProcessQueue object is used within FCFS, etc objects to run Processes. Abstraction on the Process Level.
     /// </summary>
-    public abstract class ProcessQueue : IProcessQueue
+    public abstract class ProcessQueue : IQueue
     {
 
         #region Private Vars
@@ -25,6 +25,7 @@ namespace cpusched.Queues
             protected int _totalTime = 0;
             protected int _idleTime = 0;
             protected string _queueName = "";
+            protected Process _qualifiedDemotion = null;
 
         #endregion
 
@@ -167,6 +168,8 @@ namespace cpusched.Queues
             foreach (Process p in this._ioprocs) p.Run();
             //Wait all procs in the ready queue.
             foreach (Process p in this._readyprocs) p.Wait();
+
+            this.RemoveReadyFromIO();
         }
 
         /// <summary>
@@ -261,6 +264,37 @@ namespace cpusched.Queues
 
             return Result;
 
+        }
+
+        /// <summary>
+        /// Gets processes that can be demoted.
+        /// </summary>
+        /// <returns></returns>
+        public Process GetDemotedProcess()
+        {
+            Process p = null;
+            if (this._qualifiedDemotion != null)
+            {
+                p = _qualifiedDemotion;
+                this.RemoveProcessFromQueue(p);
+            }
+            
+            _qualifiedDemotion = null;
+            
+            return p;
+
+        }
+
+        /// <summary>
+        /// Removes a process from this queue (regardless of whether the process is in IO or Ready)
+        /// </summary>
+        /// <param name="proctoremove"></param>
+        protected void RemoveProcessFromQueue(Process proctoremove)
+        {
+            //Iterate through both, make sure that the process is removed.
+            if (this._readyprocs.Contains(proctoremove)) this._readyprocs.Remove(proctoremove);
+            if (this._ioprocs.Contains(proctoremove)) this._ioprocs.Remove(proctoremove);
+            if (this._next == proctoremove) this._next = null;
         }
     }
 

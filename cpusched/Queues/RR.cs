@@ -67,6 +67,7 @@ namespace cpusched.Queues
                             Process p = this.Next;
                             this._readyprocs.Remove(p);
                             this._readyprocs.Add(p);
+                            this._qualifiedDemotion = p;
                             //Now, set a new next.
                             this._next = this._readyprocs[0];
                             this._switched = true;
