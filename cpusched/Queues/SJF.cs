@@ -18,39 +18,56 @@ namespace cpusched.Queues
         /// </summary>
         public override void Sort()
         {
+            this._switched = false;
 
-            //Do stuff
-            if (this._readyprocs.Count == 0 && this._ioprocs.Count == 0)
-            {
-                this._state = QueueState.COMPLETE;
-            }
+            if (this._readyprocs.Count == 0 && this._ioprocs.Count == 0) this._state = QueueState.COMPLETE;
             else
             {
-                //If there's no processes ready, but processes in the IO queue, this state changes to allIO.
                 if (this._readyprocs.Count == 0 && this._ioprocs.Count > 0)
                 {
-                    this._state = QueueState.ALLIO;
-                    this._next = null;
-                }
-                //Otherwise, if there's processes in the ready queue, this queue is ready.
-                else if (this._readyprocs.Count > 0)
-                {
-                    this._state = QueueState.READY;
-                    //this._next = this._readyprocs[this._readyprocs.Min(Process => Process.Time.Current.Duration)];
-                    foreach (Processes.Process p in this._readyprocs)
+                    if (this._state == QueueState.READY)
                     {
-                        Processes.Process sjf = this._readyprocs[0];
-                        if (p.Time.Current.Duration < sjf.Time.Current.Duration)
+                        this._state = QueueState.ALLIO;
+                        if (this._next != null) this._switched = true;
+                        this._next = null;
+                    }
+                }
+
+                if (this._readyprocs.Count > 0)
+                {
+
+                    if (this._state == QueueState.ALLIO) this._state = QueueState.READY;
+                    if (this._next == null || this._next.State == ProcessState.IO || this._next.State == ProcessState.COMPLETE)
+                    {
+                        Process p = findShortestJob();
+                        if (this._next != p)
                         {
+                            this._switched = true;
                             this._next = p;
                         }
-                        else { this._next = sjf; }
                     }
-                    //Processes.Process sjf = (from p in this._readyprocs
-                    //           select p.Time.Current.Duration).Min();
-                    //this._next = sjf;
+
                 }
             }
+
+        }
+
+        private Process findShortestJob()
+        {
+            Process sjf = null;
+            if (this._readyprocs.Count > 0)
+            {
+                sjf = this._readyprocs[0];
+                foreach (Process p in this._readyprocs)
+                {
+                    if (sjf != p && sjf.Time.Current.Duration > p.Time.Current.Duration)
+                    {
+                        sjf = p;
+                    }
+                }
+
+            }
+            return sjf;
 
         }
 
