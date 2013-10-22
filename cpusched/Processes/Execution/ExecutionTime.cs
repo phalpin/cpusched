@@ -63,13 +63,20 @@ namespace cpusched.Processes.Execution
 
         #endregion
 
+
+        /// <summary>
+        /// Default Constructor.
+        /// </summary>
         public ExecutionTime() { }
 
+        /// <summary>
+        /// Full constructor for ExecutionTime.
+        /// </summary>
+        /// <param name="t">List of ExecutionTimeUnits.</param>
         public ExecutionTime(List<ExecutionTimeUnit> t)
         {
             this._timeList = t;
         }
-
 
         /// <summary>
         /// Advances this ExecutionTime queue.
@@ -77,7 +84,6 @@ namespace cpusched.Processes.Execution
         public void Advance(){
             this._timeList.RemoveAt(0);
         }
-
 
         /// <summary>
         /// Decrements the Remaining Execution Time for an ExecutionTime object.

@@ -28,6 +28,7 @@ namespace cpusched
     {
 
         private string _contextSwitchString = "";
+        private ContextSwitchManager _contextSwitchManager = new ContextSwitchManager();
 
         public MainWindow()
         {
@@ -51,10 +52,11 @@ namespace cpusched
             //ProcessQueue testqueue = new FCFS();
             //Becomes...
             //ProcessQueue testqueue = new SJF(); //etc
-            //ProcessQueue testqueue = new FCFS();
+            ProcessQueue testqueue = new FCFS();
             //ProcessQueue testqueue = new SJF();
-            ProcessQueue testqueue = new RR(6);
-            
+            //ProcessQueue testqueue = new RR(6);
+
+            ContextSwitchManager csm = new ContextSwitchManager();
 
             #region Process Instantiation.
             int[][] time = new int[8][];
@@ -95,15 +97,16 @@ namespace cpusched
 
 
 
-            //Thread thread = new Thread(() => RunQueue(testqueue));
-            //IQueue displayQueue = testqueue;
-            
-            Thread thread = new Thread(() => RunQueue(testmlqueue));
-            IQueue displayQueue = testmlqueue;
+
+            #endregion
+
+            Thread thread = new Thread(() => RunQueue(testqueue, csm));
+            IQueue displayQueue = testqueue;
+            //Thread thread = new Thread(() => RunQueue(testmlqueue, csm));
+            //IQueue displayQueue = testmlqueue;
 
             thread.Start();
             thread.Join();
-            #endregion
 
             this.btn_contextswitchview.IsEnabled = true;
 
@@ -148,75 +151,27 @@ namespace cpusched
             this.lblUtilization.Content = "CPU Utilization: " + Decimal.Round((displayQueue.CPUUtil * 100), 2) + "%";
             #endregion
 
+            this._contextSwitchString = csm.ToString();
+            this._contextSwitchManager = csm;
+
             //Debug breakpoint sp
             object r = new Object();
 
             
         }
 
-        private void RunQueue(IQueue q)
+        private void RunQueue(IQueue q, ContextSwitchManager csm)
         {
             while (q.State != QueueState.COMPLETE)
             {
                 q.Run();
-                #region Context Switch Crap
-                if (q.ContextSwitch || q.State == QueueState.COMPLETE)
-                {
-                    Process switched = q.GetContextSwitch();
-                    this._contextSwitchString += "Current Time: " + (q.TotalTime - 1).ToString() + System.Environment.NewLine + System.Environment.NewLine;
-
-                    this._contextSwitchString += "Now Running: ";
-                    this._contextSwitchString += switched == null ? "[idle]" : switched.Name;
-                    this._contextSwitchString += System.Environment.NewLine;
-
-
-                    //Get all processes in ready.
-                    this._contextSwitchString += "........................................................" + System.Environment.NewLine + System.Environment.NewLine;
-                    this._contextSwitchString += "Ready Queue:\tProcess\tBurst" + System.Environment.NewLine;
-                    if (q.ReadyProcs.Count == 0 || (q.ReadyProcs.Count == 1 && q.IOProcs.Count == 0)) this._contextSwitchString += "\t\t\t\t[empty]" + System.Environment.NewLine;
-                    else foreach (Process p in q.ReadyProcs) if (p != switched) this._contextSwitchString += "\t\t\t\t" + p.Name + "\t\t" + p.Time.Current.Duration + System.Environment.NewLine;
-
-                    //Get all processes in IO
-                    this._contextSwitchString += "........................................................" + System.Environment.NewLine + System.Environment.NewLine;
-                    this._contextSwitchString += "Now in I/O:\t\tProcess\tRemaining I/O Time" + System.Environment.NewLine;
-                    if (q.IOProcs.Count == 0) this._contextSwitchString += "\t\t\t\t[empty]" + System.Environment.NewLine;
-                    else foreach (Process p in q.IOProcs) if (p != switched) this._contextSwitchString += "\t\t\t\t" + p.Name + "\t\t" + (p.Time.Current.Duration+1).ToString() + System.Environment.NewLine;
-
-                    
-                    if (q.CompleteProcs.Count > 0)
-                    {
-                        this._contextSwitchString += "........................................................" + System.Environment.NewLine + System.Environment.NewLine;
-                        this._contextSwitchString += "Completed:\t\t\t\t";
-                        int iter = 1;
-                        foreach (Process p in q.CompleteProcs)
-                        {
-                            this._contextSwitchString += p.Name;
-                            if (iter != q.CompleteProcs.Count) this._contextSwitchString += ", ";
-                            else this._contextSwitchString += System.Environment.NewLine + System.Environment.NewLine;
-                            iter++;
-                        }
-                    }
-
-                    this._contextSwitchString += "::::::::::::::::::::::::::::::::::::::::::::::::::::::::" + System.Environment.NewLine;
-                    
-
-
-
-
-                    this._contextSwitchString += System.Environment.NewLine + System.Environment.NewLine;
-
-                }
-                #endregion
+                if (q.ContextSwitch || q.State == QueueState.COMPLETE) csm.Switches.Add(new ContextSwitchRecord(q));
             }
-
-            //Thread.Sleep(500);
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            ContextSwitchView csv = new ContextSwitchView(this._contextSwitchString);
-            csv.Owner = this;
-            csv.Show();
+            GanttView gv = new GanttView(this._contextSwitchManager, this);
         }
     }
 }

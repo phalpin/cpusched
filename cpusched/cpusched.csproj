@@ -53,12 +53,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ContextSwitchView.xaml.cs">
-      <DependentUpon>ContextSwitchView.xaml</DependentUpon>
+    <Compile Include="GanttView.xaml.cs">
+      <DependentUpon>GanttView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Processes\ContextSwitchManager.cs" />
+    <Compile Include="Processes\ContextSwitchRecord.cs" />
     <Compile Include="Processes\Execution\ExecutionTime.cs" />
-    <Compile Include="Processes\Execution\ExecutionTimeType.cs" />
     <Compile Include="Processes\Execution\ExecutionTimeUnit.cs" />
+    <Compile Include="Processes\ProcessRecord.cs" />
     <Compile Include="Queues\FCFS.cs" />
     <Compile Include="Queues\IQueue.cs" />
     <Compile Include="Queues\MLFQ.cs" />
@@ -66,7 +68,7 @@
     <Compile Include="Queues\ProcessQueue.cs" />
     <Compile Include="Queues\RR.cs" />
     <Compile Include="Queues\SJF.cs" />
-    <Page Include="ContextSwitchView.xaml">
+    <Page Include="GanttView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -7,7 +7,7 @@ using cpusched.Processes;
 
 namespace cpusched.Queues
 {
-    interface IQueue
+    public interface IQueue
     {
         #region Properties
             /// <summary>

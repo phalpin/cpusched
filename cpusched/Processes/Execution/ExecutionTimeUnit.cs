@@ -45,5 +45,6 @@ namespace cpusched.Processes.Execution
             this._duration = d;
             this._type = t;
         }
+
     }
 }

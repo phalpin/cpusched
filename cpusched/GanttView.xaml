@@ -1,0 +1,8 @@
+﻿<Window x:Class="cpusched.GanttView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="GanttView" Height="408" Width="614">
+    <Grid>
+            <Canvas x:Name="CANVAS" HorizontalAlignment="Left" Height="358" VerticalAlignment="Top" Width="586" Margin="10,10,0,0" ></Canvas>
+    </Grid>
+</Window>

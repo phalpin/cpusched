@@ -3,12 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Queues="clr-namespace:cpusched.Queues" x:Name="MAINWINDOW" x:Class="cpusched.MainWindow"
         Title="CPU Scheduler Project" Height="350" Width="525" ResizeMode="NoResize">
-    <Grid>
+    <Grid ScrollViewer.CanContentScroll="True">
         <Button Content="RUN QUEUE" HorizontalAlignment="Left" Margin="10,292,0,0" VerticalAlignment="Top" Width="497" Click="Button_Click_1"/>
         <Label x:Name="lblResults" Content="QUEUE TEST RESULTS" HorizontalAlignment="Left" Margin="154,2,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="18"/>
         <DataGrid x:Name="gridResults" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Height="216" Width="497" HorizontalGridLinesBrush="#FF646464" VerticalGridLinesBrush="#FF646464"/>
         <Label x:Name="lblUtilization" Content="CPU Utilization:" HorizontalAlignment="Left" Margin="10,262,0,0" VerticalAlignment="Top" Width="338"/>
-        <Button x:Name="btn_contextswitchview" Content="View Context Switches" HorizontalAlignment="Left" Margin="353,265,0,0" VerticalAlignment="Top" Width="154" Click="Button_Click_2" IsEnabled="False"/>
+        <Button x:Name="btn_contextswitchview" Content="View Gantt Chart" HorizontalAlignment="Left" Margin="353,265,0,0" VerticalAlignment="Top" Width="154" Click="Button_Click_2" IsEnabled="False"/>
 
     </Grid>
 </Window>

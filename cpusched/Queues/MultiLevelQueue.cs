@@ -57,9 +57,7 @@ namespace cpusched.Queues
                 get
                 {
                     List<Process> result = new List<Process>();
-                    foreach(ProcessQueue pq in this._queues){
-                        result.AddRange(pq.CompleteProcs);
-                    }
+                    foreach(ProcessQueue pq in this._queues) result.AddRange(pq.CompleteProcs);
                     result.Sort((x, y) => x.Name.CompareTo(y.Name));
                     return result;
                 }
@@ -73,11 +71,7 @@ namespace cpusched.Queues
                 get
                 {
                     List<Process> result = new List<Process>();
-                    foreach (ProcessQueue pq in this._queues)
-                    {
-                        result.AddRange(pq.ReadyProcs);
-                    }
-                    result.Sort((x, y) => x.Name.CompareTo(y.Name));
+                    foreach (ProcessQueue pq in this._queues) result.AddRange(pq.ReadyProcs);
                     return result;
                 }
             }
@@ -90,33 +84,8 @@ namespace cpusched.Queues
                 get
                 {
                     List<Process> result = new List<Process>();
-                    foreach (ProcessQueue pq in this._queues)
-                    {
-                        result.AddRange(pq.IOProcs);
-                    }
+                    foreach (ProcessQueue pq in this._queues) result.AddRange(pq.IOProcs);
                     result.Sort((x, y) => x.Name.CompareTo(y.Name));
-                    return result;
-                }
-            }
-
-            public string ReadyProcNames
-            {
-                get
-                {
-                    string result = "";
-                    foreach (Process p in this.ReadyProcs) result += "[" + p.Name + ":" + p.Parent.Name + ":" + p.Time.Current.Duration.ToString() + "] ";
-                    
-                    return result;
-                }
-            }
-
-            public string IOProcNames
-            {
-                get
-                {
-                    string result = "";
-                    foreach (Process p in this.IOProcs) result += "[" + p.Name + ":" + p.Parent.Name + ":" + p.Time.Current.Duration.ToString() + "] ";
-                    
                     return result;
                 }
             }
@@ -170,6 +139,10 @@ namespace cpusched.Queues
             return result;
         }
 
+        /// <summary>
+        /// Simply runs the queue without Sort()ing first.
+        /// </summary>
+        /// <returns></returns>
         public QueueExecutionResult RunWithoutSort()
         {
             QueueExecutionResult result = QueueExecutionResult.IDLE;
@@ -215,6 +188,9 @@ namespace cpusched.Queues
             foreach (ProcessQueue pq in this._queues) pq.Wait();
         }
 
+        /// <summary>
+        /// To be defined in the individual MLQ
+        /// </summary>
         public abstract void Sort();
 
         /// <summary>
@@ -257,6 +233,9 @@ namespace cpusched.Queues
             return p;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Cleanup() { }
     }
 }

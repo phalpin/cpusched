@@ -52,6 +52,10 @@ namespace cpusched.Queues
 
         }
 
+        /// <summary>
+        /// Finds the shortest job in the ready queue and returns it.
+        /// </summary>
+        /// <returns>Process w/ shortest runtime.</returns>
         private Process findShortestJob()
         {
             Process sjf = null;

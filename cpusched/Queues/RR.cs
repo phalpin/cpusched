@@ -23,7 +23,10 @@ namespace cpusched.Queues
             set { this._timequantum = value; }
         }
 
-        //Allows us to initialize a RR Queue with a Time Quantum
+        /// <summary>
+        /// Allows us to initialize a RR Queue with a Time Quantum
+        /// </summary>
+        /// <param name="timequantum"></param>
         public RR(int timequantum)
         {
             this._timequantum = timequantum;

@@ -85,6 +85,9 @@ namespace cpusched.Processes
                 get { return this._activeTimeOnProc; }
             }
 
+            /// <summary>
+            /// The parent queue of this object.
+            /// </summary>
             public ProcessQueue Parent
             {
                 get;
@@ -97,11 +100,30 @@ namespace cpusched.Processes
 
         public Process() { }
 
-
+        /// <summary>
+        /// Instantiate a process with an executiontime predetermined.
+        /// </summary>
+        /// <param name="t"></param>
         public Process(ExecutionTime t)
         {
             this._executiontime = t;
             this._executiontime.Parent = this;
+        }
+
+        /// <summary>
+        /// Copy Constructor.
+        /// </summary>
+        /// <param name="p"></param>
+        public Process(Process p)
+        {
+            this._state = p._state;
+            this._executiontime = p._executiontime;
+            this._name = p._name;
+            this._hasRun = p._hasRun;
+            this._waitingtime = p._waitingtime;
+            this._turnaroundtime = p._turnaroundtime;
+            this._responsetime = p._responsetime;
+            this._activeTimeOnProc = p._activeTimeOnProc;
         }
 
         /// <summary>
