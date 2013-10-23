@@ -68,6 +68,7 @@
     <Compile Include="Queues\ProcessQueue.cs" />
     <Compile Include="Queues\RR.cs" />
     <Compile Include="Queues\SJF.cs" />
+    <Compile Include="Utils.cs" />
     <Page Include="GanttView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

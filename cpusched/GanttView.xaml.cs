@@ -29,30 +29,6 @@ namespace cpusched
         }
 
         /// <summary>
-        /// Contextualize Gantt Chart in here.
-        /// </summary>
-        /// <param name="csm"></param>
-        private void ContextualizeGanttChart(ContextSwitchManager csm)
-        {
-
-            
-            int j = 0;
-            //Run through all the elapsed time of the queue.
-            for (int i = 0; i <= csm.Switches[csm.Switches.Count - 1].Time; i++)
-            {
-                //Create New Group.
-                if (i % 50 == 0)
-                {
-
-                }
-                else
-                {
-
-                }
-            }
-        }
-
-        /// <summary>
         /// Draw the Gantt Chart.
         /// </summary>
         /// <param name="csm"></param>

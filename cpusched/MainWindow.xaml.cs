@@ -18,6 +18,7 @@ using cpusched.Processes.Execution;
 using System.Data;
 using System.Threading;
 using System.Windows.Media.Effects;
+using cpusched;
 
 namespace cpusched
 {
@@ -27,38 +28,166 @@ namespace cpusched
     public partial class MainWindow : Window
     {
 
-        private string _contextSwitchString = "";
-        private ContextSwitchManager _contextSwitchManager = new ContextSwitchManager();
-
         public MainWindow()
         {
             InitializeComponent();
-            //Testing Branch Commit.
         }
 
+
         /// <summary>
-        /// USE THIS FOR TESTING. It will prepare all of the times for you. All you have to input is commented.
+        /// A very unfortunately named function. Handles the logic for the demo.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
 
-            //this.MAINWINDOW.Effect = new BlurEffect();
+            //FCFS Instantiation
+            ProcessQueue fcfsQueue = new FCFS();
+            this.PopulateDemoQueue(fcfsQueue);
+            ContextSwitchManager csmFCFS = new ContextSwitchManager();
+            Grid fcfsparent = this.tabfcfs;
+            Thread threadfcfs = new Thread(() => RunQueue(fcfsQueue, csmFCFS));
+
+            //SJF Instantiation
+            ProcessQueue sjfQueue = new SJF();
+            this.PopulateDemoQueue(sjfQueue);
+            ContextSwitchManager csmSJF = new ContextSwitchManager();
+            Grid sjfparent = this.tabsjf;
+            Thread threadsjf = new Thread(() => RunQueue(sjfQueue, csmSJF));
 
 
-            //CHANGE THE BELOW LINE TO TEST YOUR QUEUE.
-            //EXAMPLE:
-            //ProcessQueue testqueue = new FCFS();
-            //Becomes...
-            //ProcessQueue testqueue = new SJF(); //etc
-            ProcessQueue testqueue = new FCFS();
-            //ProcessQueue testqueue = new SJF();
-            //ProcessQueue testqueue = new RR(6);
+            //MLFQ Instantiation
+            MultiLevelQueue mlfqQueue = new MLFQ();
+            ProcessQueue mlfqRR6 = new RR(6);
+            this.PopulateDemoQueue(mlfqRR6);
+            ProcessQueue mlfqRR11 = new RR(11);
+            ProcessQueue mlfqFCFS = new FCFS();
+            mlfqQueue.AddProcessQueue(mlfqRR6);
+            mlfqQueue.AddProcessQueue(mlfqRR11);
+            mlfqQueue.AddProcessQueue(mlfqFCFS);
+            ContextSwitchManager csmMLFQ = new ContextSwitchManager();
+            Grid mlfqparent = this.tabmlfq;
+            Thread threadmlfq = new Thread(() => RunQueue(mlfqQueue, csmMLFQ));
 
-            ContextSwitchManager csm = new ContextSwitchManager();
 
-            #region Process Instantiation.
+            
+            
+            
+
+            //Spawn off the threads.
+            threadfcfs.Start();
+            threadsjf.Start();
+            threadmlfq.Start();
+
+            //Join back up with the threads.
+            threadfcfs.Join();
+            threadsjf.Join();
+            threadmlfq.Join();
+
+            this.PopulateResults(fcfsQueue, csmFCFS, fcfsparent);
+            this.PopulateResults(sjfQueue, csmSJF, sjfparent);
+            this.PopulateResults(mlfqQueue, csmMLFQ, mlfqparent);
+
+            this.GenerateTextFile("fcfsFall2013.txt", csmFCFS);
+            this.GenerateTextFile("sjfFall2013.txt", csmSJF);
+            this.GenerateTextFile("mlfqFall2013.txt", csmMLFQ);
+ 
+
+        }
+
+
+        /// <summary>
+        /// Generates the Required Text Files.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="csm"></param>
+        private void GenerateTextFile(string fileName, ContextSwitchManager csm)
+        {
+            string fulluri = System.Environment.CurrentDirectory + "\\" + fileName;
+            System.IO.File.WriteAllText(@fulluri, csm.ToString());
+        }
+
+        /// <summary>
+        /// Populates the results of a TabItem
+        /// </summary>
+        /// <param name="queue"></param>
+        /// <param name="csm"></param>
+        /// <param name="g"></param>
+        private void PopulateResults(IQueue queue, ContextSwitchManager csm, Grid g)
+        {
+            //Determine the grid view.
+            DataGrid dg = (DataGrid)g.Children[0];
+
+            //Determine the CPU Util View
+            Label cpuutil = (Label)g.Children[1];
+
+            //Determine the GanttView button.
+            Button ganttView = (Button)g.Children[2];
+
+            #region Display Logic
+
+            //Datatable to display results.
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Process");
+            dt.Columns.Add("WT");
+            dt.Columns.Add("TT");
+            dt.Columns.Add("RT");
+
+            queue.CompleteProcs.Sort((x, y) => x.Name.CompareTo(y.Name));
+
+            foreach (Process p in queue.CompleteProcs)
+            {
+                dt.Rows.Add(p.Name, p.WaitingTime, p.TurnaroundTime, p.ResponseTime);
+            }
+
+
+
+            double avgWaitingTime = 0;
+            double avgTurnaroundTime = 0;
+            double avgResponseTime = 0;
+
+            foreach (Process p in queue.CompleteProcs)
+            {
+                avgWaitingTime += p.WaitingTime;
+                avgTurnaroundTime += p.TurnaroundTime;
+                avgResponseTime += p.ResponseTime;
+            }
+
+            avgWaitingTime /= queue.CompleteProcs.Count;
+            avgTurnaroundTime /= queue.CompleteProcs.Count;
+            avgResponseTime /= queue.CompleteProcs.Count;
+
+            dt.Rows.Add("Avg", avgWaitingTime, avgTurnaroundTime, avgResponseTime);
+
+            dg.ItemsSource = dt.DefaultView;
+            dg.HorizontalGridLinesBrush = dg.VerticalGridLinesBrush = new SolidColorBrush(Colors.LightGray);
+
+            cpuutil.Content = "CPU Utilization: " + Decimal.Round((queue.CPUUtil * 100), 2) + "%";
+
+            ganttView.IsEnabled = true;
+            ganttView.Click += delegate { GetGanttView(csm); };
+            #endregion
+        }
+
+        /// <summary>
+        /// Populates a demo queue with the demo processes.
+        /// </summary>
+        /// <param name="q"></param>
+        private void PopulateDemoQueue(ProcessQueue q)
+        {
+            List<Process> procs = this.GetDemoProcesses();
+            foreach (Process p in procs) q.AddProcess(p);
+        }
+
+        /// <summary>
+        /// Gets the default demo process stuff.
+        /// </summary>
+        /// <returns></returns>
+        private List<Process> GetDemoProcesses()
+        {
+            List<Process> results = new List<Process>();
+
             int[][] time = new int[8][];
             time[0] = new int[] { 4, 24, 5, 73, 3, 31, 5, 27, 4, 33, 6, 43, 4, 64, 5, 19, 2 };
             time[1] = new int[] { 18, 31, 19, 35, 11, 42, 18, 43, 19, 47, 18, 43, 17, 51, 19, 32, 10 };
@@ -85,81 +214,19 @@ namespace cpusched
                 ExecutionTime et = new ExecutionTime(t);
                 Process proc = new Process(et);
                 proc.Name = "P" + pnum.ToString();
-                testqueue.AddProcess(proc);
+                results.Add(proc);
                 pnum++;
             }
 
-            MLFQ testmlqueue = new MLFQ();
-            testqueue.Name = "Q1";
-            testmlqueue.AddProcessQueue(testqueue);
-            testmlqueue.AddProcessQueue(new RR(11) { Name = "Q2" });
-            testmlqueue.AddProcessQueue(new FCFS() { Name = "Q3" });
+            return results;
 
-
-
-
-            #endregion
-
-            Thread thread = new Thread(() => RunQueue(testqueue, csm));
-            IQueue displayQueue = testqueue;
-            //Thread thread = new Thread(() => RunQueue(testmlqueue, csm));
-            //IQueue displayQueue = testmlqueue;
-
-            thread.Start();
-            thread.Join();
-
-            this.btn_contextswitchview.IsEnabled = true;
-
-            #region Display crap for debugging
-
-            //Datatable to display results.
-            DataTable dt = new DataTable();
-            dt.Columns.Add("Process");
-            dt.Columns.Add("WT");
-            dt.Columns.Add("TT");
-            dt.Columns.Add("RT");
-
-            displayQueue.CompleteProcs.Sort((x, y) => x.Name.CompareTo(y.Name));
-
-            foreach (Process p in displayQueue.CompleteProcs)
-            {
-                dt.Rows.Add(p.Name, p.WaitingTime, p.TurnaroundTime, p.ResponseTime);
-            }
-
-
-            
-            double avgWaitingTime = 0;
-            double avgTurnaroundTime = 0;
-            double avgResponseTime = 0;
-
-            foreach (Process p in displayQueue.CompleteProcs)
-            {
-                avgWaitingTime += p.WaitingTime;
-                avgTurnaroundTime += p.TurnaroundTime;
-                avgResponseTime += p.ResponseTime;
-            }
-
-            avgWaitingTime /= displayQueue.CompleteProcs.Count;
-            avgTurnaroundTime /= displayQueue.CompleteProcs.Count;
-            avgResponseTime /= displayQueue.CompleteProcs.Count;
-
-            dt.Rows.Add("Avg", avgWaitingTime, avgTurnaroundTime, avgResponseTime);
-
-            gridResults.ItemsSource = dt.DefaultView;
-            gridResults.HorizontalGridLinesBrush = gridResults.VerticalGridLinesBrush = new SolidColorBrush(Colors.LightGray);
-
-            this.lblUtilization.Content = "CPU Utilization: " + Decimal.Round((displayQueue.CPUUtil * 100), 2) + "%";
-            #endregion
-
-            this._contextSwitchString = csm.ToString();
-            this._contextSwitchManager = csm;
-
-            //Debug breakpoint sp
-            object r = new Object();
-
-            
         }
 
+        /// <summary>
+        /// Runs a queue & provides info to a contextswitchmanager.
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="csm"></param>
         private void RunQueue(IQueue q, ContextSwitchManager csm)
         {
             while (q.State != QueueState.COMPLETE)
@@ -169,9 +236,9 @@ namespace cpusched
             }
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
+        private void GetGanttView(ContextSwitchManager csm)
         {
-            GanttView gv = new GanttView(this._contextSwitchManager, this);
+            GanttView gv = new GanttView(csm, this);
         }
     }
 }
